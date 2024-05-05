@@ -1,4 +1,6 @@
-const { test, after, beforeEach } = require('node:test');
+const {
+  test, after, beforeEach, describe,
+} = require('node:test');
 const assert = require('node:assert');
 const mongoose = require('mongoose');
 const supertest = require('supertest');
@@ -23,32 +25,42 @@ const initialBlogs = [
   },
 ];
 
-beforeEach(async () => {
-  await Blog.deleteMany({});
-  let blogObject = new Blog(initialBlogs[0]);
-  await blogObject.save();
-  blogObject = new Blog(initialBlogs[1]);
-  await blogObject.save();
-});
+describe.only('api test', () => {
+  beforeEach(async () => {
+    await Blog.deleteMany({});
+    let blogObject = new Blog(initialBlogs[0]);
+    await blogObject.save();
+    blogObject = new Blog(initialBlogs[1]);
+    await blogObject.save();
+  });
 
-test('notes are returned as json', async () => {
-  await api
-    .get('/api/blogs')
-    .expect(200)
-    .expect('Content-Type', /application\/json/);
-});
+  test('notes are returned as json', async () => {
+    await api
+      .get('/api/blogs')
+      .expect(200)
+      .expect('Content-Type', /application\/json/);
+  });
 
-test.only('there are two blogs', async () => {
-  const response = await api.get('/api/blogs')
+  test('there are two blogs', async () => {
+    const response = await api.get('/api/blogs');
 
-  assert.strictEqual(response.body.length, initialBlogs.length);
-});
+    assert.strictEqual(response.body.length, initialBlogs.length);
+  });
 
-test.only('first blog includes react patterns', async () => {
-  const response = await api.get('/api/blogs');
-  const contents = JSON.stringify(response.body[0]);
+  test('first blog includes react patterns', async () => {
+    const response = await api.get('/api/blogs');
+    const contents = JSON.stringify(response.body[0]);
 
-  assert(contents.includes('React patterns'));
+    assert(contents.includes('React patterns'));
+  });
+
+  test.only('blog unique identifier is named id', async () => {
+    const response = await api.get('/api/blogs');
+    const contents = JSON.stringify(response.body[0]);
+
+    assert(contents.includes('id'));
+    assert.strictEqual(contents.includes('_id'), false);
+  });
 });
 
 after(async () => {
