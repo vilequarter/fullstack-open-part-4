@@ -6,7 +6,6 @@ const mongoose = require('mongoose');
 const supertest = require('supertest');
 const app = require('../app');
 const Blog = require('../models/blog');
-const logger = require('../utils/logger');
 
 const api = supertest(app);
 
@@ -54,12 +53,33 @@ describe.only('api test', () => {
     assert(contents.includes('React patterns'));
   });
 
-  test.only('blog unique identifier is named id', async () => {
+  test('blog unique identifier is named id', async () => {
     const response = await api.get('/api/blogs');
     const contents = JSON.stringify(response.body[0]);
 
     assert(contents.includes('id'));
     assert.strictEqual(contents.includes('_id'), false);
+  });
+
+  test.only('making a POST request adds a blog to the database', async () => {
+    const newBlog = {
+      title: 'This is only a test',
+      author: 'Mr. Testman',
+      url: 'www.testtest.test',
+      likes: 42,
+   };
+
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/);
+    
+    const response = await api.get('/api/blogs');
+    const contents = JSON.stringify(response.body[2]);
+
+    assert.strictEqual(response.body.length, initialBlogs.length + 1);
+    assert(contents.includes('This is only a test'));
   });
 });
 
