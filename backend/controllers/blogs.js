@@ -14,6 +14,12 @@ blogsRouter.post('/', async (request, response) => {
     likes: request.body.likes || 0,
   });
 
+  console.log(blog.title);
+
+  if(blog.title === undefined || blog.author === undefined){
+    return response.status(400).send({ error: 'Bad Request' });
+  }
+
   const result = await blog.save();
   response.status(201).json(result);
 });

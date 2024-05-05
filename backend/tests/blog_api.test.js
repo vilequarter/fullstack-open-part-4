@@ -82,7 +82,7 @@ describe.only('api test', () => {
     assert(contents.includes('This is only a test'));
   });
 
-  test.only('making a new blog without a likes field defaults the value to 0', async () => {
+  test('making a new blog without a likes field defaults the value to 0', async () => {
     const newBlog = {
       title: 'Nobody likes me',
       author: 'Mr. Sadman',
@@ -99,6 +99,32 @@ describe.only('api test', () => {
     const likes = response.body[2].likes;
 
     assert.strictEqual(likes, 0);
+  });
+
+  test.only('missing title in new blog request returns 400 error', async () => {
+    const newBlog = {
+      author: 'Ms. Mystery',
+      url: 'www.nobodyknows.org',
+      likes: 999,
+    };
+
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(400);
+  });
+
+  test.only('missing author in new blog request returns 400 error', async () => {
+    const newBlog = {
+      title: 'Super clean initiation',
+      url: 'www.nobody.ghost',
+      likes: 404,
+    };
+
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(400);
   });
 });
 
