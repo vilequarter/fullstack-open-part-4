@@ -61,7 +61,7 @@ describe.only('api test', () => {
     assert.strictEqual(contents.includes('_id'), false);
   });
 
-  test.only('making a POST request adds a blog to the database', async () => {
+  test('making a POST request adds a blog to the database', async () => {
     const newBlog = {
       title: 'This is only a test',
       author: 'Mr. Testman',
@@ -80,6 +80,25 @@ describe.only('api test', () => {
 
     assert.strictEqual(response.body.length, initialBlogs.length + 1);
     assert(contents.includes('This is only a test'));
+  });
+
+  test.only('making a new blog without a likes field defaults the value to 0', async () => {
+    const newBlog = {
+      title: 'Nobody likes me',
+      author: 'Mr. Sadman',
+      url: 'www.goeatworms.net',
+    };
+
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/);
+    
+    const response = await api.get('/api/blogs');
+    const likes = response.body[2].likes;
+
+    assert.strictEqual(likes, 0);
   });
 });
 
