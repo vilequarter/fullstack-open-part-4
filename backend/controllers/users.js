@@ -4,6 +4,12 @@ const User = require('../models/user');
 
 usersRouter.post('/', async (request, response, next) => {
   try{
+    if(request.body.username === undefined || request.body.password === undefined){
+      return response.status(400).send({ error: 'expected `username` and `password`' });
+    };
+    if(request.body.username.length < 3 || request.body.password.length < 3){
+      return response.status(400).send({ error: 'username and password must be at least 3 characters' });
+    };
     const { username, name, password } = request.body;
 
     const saltRounds = 10;

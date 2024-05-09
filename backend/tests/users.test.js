@@ -11,7 +11,7 @@ const app = require('../app');
 
 const api = supertest(app);
 
-describe.only('when there is initially one user in db', () => {
+describe('when there is initially one user in db', () => {
   beforeEach(async () => {
     await User.deleteMany({});
 
@@ -21,7 +21,7 @@ describe.only('when there is initially one user in db', () => {
     await user.save();
   });
 
-  test.only('creation succeeds with a fresh username', async () => {
+  test('creation succeeds with a fresh username', async () => {
     const usersAtStart = await helper.usersInDb();
 
     const newUser = {
@@ -43,7 +43,7 @@ describe.only('when there is initially one user in db', () => {
     assert(usernames.includes(newUser.username));
   });
 
-  test.only('creation fails when username is already in db', async () => {
+  test('creation fails when username is already in db', async () => {
     const usersAtStart = await helper.usersInDb();
 
     const newUser = {
@@ -60,6 +60,86 @@ describe.only('when there is initially one user in db', () => {
     const usersAtEnd = await helper.usersInDb();
     assert.strictEqual(usersAtEnd.length, usersAtStart.length);
     assert(result.body.error.includes('expected `username` to be unique'));
+  });
+});
+
+describe.only('creating valid users', () => {
+  beforeEach(async () => {
+    await User.deleteMany({});
+  });
+
+  test.only('creating user without username fails', async () => {
+    const usersAtStart = await helper.usersInDb();
+
+    const newUser = {
+      name: 'Mr. Testman',
+      password: 'namtseT .rM',
+    };
+
+    const result = await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(400);
+    
+    const usersAtEnd = await helper.usersInDb();
+    assert.strictEqual(usersAtEnd.length, usersAtStart.length);
+    assert(result.body.error.includes('expected `username` and `password`'));
+  });
+
+  test.only('creating user without password fails', async () => {
+    const usersAtStart = await helper.usersInDb();
+
+    const newUser = {
+      username: 'test',
+      name: 'Mr. Testman',
+    };
+
+    const result = await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(400);
+    
+    const usersAtEnd = await helper.usersInDb();
+    assert.strictEqual(usersAtEnd.length, usersAtStart.length);
+    assert(result.body.error.includes('expected `username` and `password`'));
+  });
+
+  test.only('username under 3 characters fails', async () => {
+    const usersAtStart = await helper.usersInDb();
+
+    const newUser = {
+      username: 'te',
+      name: 'Mr. Testman',
+      password: 'namtseT .rM',
+    };
+
+    const result = await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(400);
+    
+    const usersAtEnd = await helper.usersInDb();
+    assert.strictEqual(usersAtEnd.length, usersAtStart.length);
+    assert(result.body.error.includes('username and password must be at least 3 characters'));
+  });
+
+  test.only('password under 3 characcters fails', async () => {
+    const usersAtStart = await helper.usersInDb();
+
+    const newUser = {
+      username: 'test',
+      name: 'Mr. Testman',
+      password: 'na',
+    };
+
+    const result = await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(400);
+    
+    const usersAtEnd = await helper.usersInDb();
+    assert.strictEqual(usersAtEnd.length, usersAtStart.length);
+    assert(result.body.error.includes('username and password must be at least 3 characters'));
   });
 });
 
