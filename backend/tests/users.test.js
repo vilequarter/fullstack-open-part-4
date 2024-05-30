@@ -63,12 +63,12 @@ describe('when there is initially one user in db', () => {
   });
 });
 
-describe.only('creating valid users', () => {
+describe('creating valid users', () => {
   beforeEach(async () => {
     await User.deleteMany({});
   });
 
-  test.only('creating user without username fails', async () => {
+  test('creating user without username fails', async () => {
     const usersAtStart = await helper.usersInDb();
 
     const newUser = {
@@ -86,7 +86,7 @@ describe.only('creating valid users', () => {
     assert(result.body.error.includes('expected `username` and `password`'));
   });
 
-  test.only('creating user without password fails', async () => {
+  test('creating user without password fails', async () => {
     const usersAtStart = await helper.usersInDb();
 
     const newUser = {
@@ -104,7 +104,7 @@ describe.only('creating valid users', () => {
     assert(result.body.error.includes('expected `username` and `password`'));
   });
 
-  test.only('username under 3 characters fails', async () => {
+  test('username under 3 characters fails', async () => {
     const usersAtStart = await helper.usersInDb();
 
     const newUser = {
@@ -123,7 +123,7 @@ describe.only('creating valid users', () => {
     assert(result.body.error.includes('username and password must be at least 3 characters'));
   });
 
-  test.only('password under 3 characcters fails', async () => {
+  test('password under 3 characcters fails', async () => {
     const usersAtStart = await helper.usersInDb();
 
     const newUser = {
