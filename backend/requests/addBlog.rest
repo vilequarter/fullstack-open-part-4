@@ -1,8 +1,9 @@
 POST http://localhost:3003/api/blogs/
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlRlc3QiLCJpZCI6IjY2NTg1NzY2NDViYjNlY2ZiZDUyZThmMiIsImlhdCI6MTcxNzEzNDY2MX0.OhwmRG5C-kGLD4zeHmF3vU35MKga_9FWnUfRtq3rz7k
 
 {
-  "title": "Test",
+  "title": "TestLogin",
   "author": "Mr. Testman",
   "url": "testmantest.com",
   "likes": 1
