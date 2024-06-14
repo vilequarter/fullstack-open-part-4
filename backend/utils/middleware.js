@@ -46,6 +46,9 @@ const tokenExtractor = (request, response, next) => {
 };
 
 const userExtractor = async (request, response, next) => {
+  if(!request.token){
+    return response.status(401).json({ error: 'no token provided' });
+  }
   const decodedToken = jwt.verify(request.token, process.env.SECRET);
   if(!decodedToken.id) {
     request.user = null;

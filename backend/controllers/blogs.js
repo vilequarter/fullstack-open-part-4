@@ -49,6 +49,9 @@ blogsRouter.delete('/:id', async (request, response, next) => {
     }
     
     const blog = await Blog.findById(request.params.id);
+    if(!blog){
+      return response.status(204).send({ error: 'blog does not exist' });
+    }
     if(blog.user.toString() === user.id.toString()) {
       await Blog.findByIdAndDelete(request.params.id);
       response.status(204).end();

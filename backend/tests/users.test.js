@@ -13,14 +13,8 @@ const api = supertest(app);
 
 describe('when there is initially one user in db', () => {
   beforeEach(async () => {
-    await User.deleteMany({});
-
-    const passwordHash = await bcrypt.hash('drowssap', 10);
-    const user = new User({ username: 'root', passwordHash });
-
-    await user.save();
-  });
-
+    await api.post('/api/users').send({ username: 'root', password: 'namtset .rM'});
+  })
   test('creation succeeds with a fresh username', async () => {
     const usersAtStart = await helper.usersInDb();
 
@@ -82,6 +76,7 @@ describe('creating valid users', () => {
       .expect(400);
     
     const usersAtEnd = await helper.usersInDb();
+    console.log('usersAtStart', usersAtStart, 'usersAtEnd', usersAtEnd);
     assert.strictEqual(usersAtEnd.length, usersAtStart.length);
     assert(result.body.error.includes('expected `username` and `password`'));
   });

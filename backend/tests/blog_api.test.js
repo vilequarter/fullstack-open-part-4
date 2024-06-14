@@ -1,3 +1,4 @@
+
 const {
   test, after, beforeEach, describe,
 } = require('node:test');
@@ -7,20 +8,22 @@ const supertest = require('supertest');
 const helper = require('./test_helper');
 const app = require('../app');
 const Blog = require('../models/blog');
+const User = require('../models/user');
 
-const api = supertest(app);
-
-beforeEach(async () => {
-  await Blog.deleteMany({});
-
-  const blogObjects = helper.initialBlogs
-    .map((blog) => new Blog(blog));
-  const promiseArray = blogObjects.map((blog) => blog.save());
-  await Promise.all(promiseArray);
-});
+let api;
 
 describe('general api test', () => {
-  test('notes are returned as json', async () => {
+  beforeEach(async () => {
+    api = await helper.authorizedApi();
+    await Blog.deleteMany({});
+  
+    const blogObjects = helper.initialBlogs
+      .map((blog) => new Blog(blog));
+    const promiseArray = blogObjects.map((blog) => blog.save());
+    await Promise.all(promiseArray);
+  });
+
+  test('blogs are returned as json', async () => {
     await api
       .get('/api/blogs')
       .expect(200)
@@ -49,7 +52,16 @@ describe('general api test', () => {
   });
 });
 
-describe('POST requests', () => {
+describe.only('POST requests', () => {
+  beforeEach(async () => {
+    api = await helper.authorizedApi();
+    await Blog.deleteMany({});
+  
+    const blogObjects = helper.initialBlogs
+      .map((blog) => new Blog(blog));
+    const promiseArray = blogObjects.map((blog) => blog.save());
+    await Promise.all(promiseArray);
+  });
 
   test('making a POST request adds a blog to the database', async () => {
     const newBlog = {
@@ -124,9 +136,29 @@ describe('POST requests', () => {
 
     assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length);
   });
+
+  test.only('no token provided returns 401 error', async () => {
+    api = supertest(app);
+    const newBlog = {
+      author: 'Ms. Mystery',
+      url: 'www.nobodyknows.org',
+      likes: 999,
+    };
+    await api.post('/api/blogs')
+      .send(newBlog)
+      .expect(401);
+  })
 });
 
 describe('DELETE requests', () => {
+  beforeEach(async () => {
+    api = await helper.authorizedApi();
+    await Blog.deleteMany({});
+  
+    const promiseArray = helper.initialBlogs.map((blog) => api.post('/api/blogs').send(blog));
+    await Promise.all(promiseArray);
+  });
+
   test('making a DELETE request on an id removes the blog', async () => {
     const blogsAtStart = await helper.blogsInDb();
     const blogToDelete = blogsAtStart[0];
@@ -163,6 +195,16 @@ describe('DELETE requests', () => {
 });
 
 describe('UPDATE requests', () => {
+  beforeEach(async () => {
+    api = await helper.authorizedApi();
+    await Blog.deleteMany({});
+  
+    const blogObjects = helper.initialBlogs
+      .map((blog) => new Blog(blog));
+    const promiseArray = blogObjects.map((blog) => blog.save());
+    await Promise.all(promiseArray);
+  });
+
   test('making an UPDATE request on an id changes the info', async () => {
     const blogsAtStart = await helper.blogsInDb();
     const blogToUpdate = blogsAtStart[0];
