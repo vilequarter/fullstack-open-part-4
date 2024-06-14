@@ -52,7 +52,7 @@ describe('general api test', () => {
   });
 });
 
-describe.only('POST requests', () => {
+describe('POST requests', () => {
   beforeEach(async () => {
     api = await helper.authorizedApi();
     await Blog.deleteMany({});
@@ -137,7 +137,7 @@ describe.only('POST requests', () => {
     assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length);
   });
 
-  test.only('no token provided returns 401 error', async () => {
+  test('no token provided returns 401 error', async () => {
     api = supertest(app);
     const newBlog = {
       author: 'Ms. Mystery',
